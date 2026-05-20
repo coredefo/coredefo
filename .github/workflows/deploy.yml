@@ -1,0 +1,35 @@
+name: Deploy Main Site
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачиваем код из GitHub
+        uses: actions/checkout@v4
+
+      - name: Настраиваем Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Устанавливаем зависимости
+        run: npm install
+
+      - name: Собираем Vite проект
+        run: npx vite build packages/main-landing
+
+      - name: Копируем файлы на твой VPS сервер
+        uses: appleboy/scp-action@master
+        with:
+          host: 2.26.123.33       
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "packages/coredefo/dist/*"
+          target: "/var/www/coredefo/main"
+          strip_components: 3 
