@@ -22,14 +22,14 @@ jobs:
         run: npm install
 
       - name: Собираем Vite проект
-        run: npx vite build packages/coredefo # <--- ИСПРАВИЛИ ТУТ (было main-landing)
+        run: npx vite build packages/coredefo
 
       - name: Копируем файлы на твой VPS сервер
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: 2.26.123.33       
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "packages/coredefo/dist/*"   # <--- ТУТ ВСЁ ПРАВИЛЬНО, оставляем coredefo
+          source: "packages/coredefo/dist/*"   
           target: "/var/www/coredefo/main"
           strip_components: 3
