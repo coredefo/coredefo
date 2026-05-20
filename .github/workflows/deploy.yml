@@ -24,12 +24,13 @@ jobs:
       - name: Собираем Vite проект
         run: npx vite build packages/coredefo
 
-      - name: Копируем файлы на твой VPS сервер
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: 2.26.123.33       
-          username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "packages/coredefo/dist/*"   
-          target: "/var/www/coredefo/main"
-          strip_components: 3
+      - name: Настраиваем SSH-ключ для отправки
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 2.26.123.33 >> ~/.ssh/known_hosts
+
+      - name: Копируем файлы через нативный SCP
+        run: |
+          scp -r packages/coredefo/dist/* root@2.26.123.33:/var/www/coredefo/main/
